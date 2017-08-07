@@ -1,51 +1,89 @@
-var savedDesktops = {};
-function handler(client, full, user) {
-    if (full) {
-        savedDesktops[client.windowId] = client.desktop;
+var state = {
+    savedDesktops: {},
+    enabled: true
+};
 
-        var next = workspace.desktops + 1;
-        workspace.desktops = next;
-        client.desktop = next;
-        workspace.currentDesktop = next;
-        workspace.activateClient = client;
+function log(msg) {
+    print("KWinMax2NewVirtualDesktop: " + msg);
+}
+
+function moveToNewDesktop(client) {
+    state.savedDesktops[client.windowId] = client.desktop;
+
+    var next = workspace.desktops + 1;
+    workspace.desktops = next;
+    client.desktop = next;
+    workspace.currentDesktop = next;
+    workspace.activateClient = client;
+}
+
+function moveBack(client) {
+    var saved = state.savedDesktops[client.windowId];
+    if (saved === undefined) {
+        log("Ignoring window not previously seen: " + client.caption);
     } else {
-        var saved = savedDesktops[client.windowId];
-        if (saved === undefined) {
-            print("Old info not found");
-        } else {
-            print("Resotre client desktop to " + saved);
-            client.desktop = saved;
-            workspace.currentDesktop = saved;
-            workspace.activateClient = client;
+        log("Resotre client desktop to " + saved);
+        client.desktop = saved;
+        workspace.currentDesktop = saved;
+        workspace.activateClient = client;
 
-            workspace.desktops -= 1;
-        }
+        workspace.desktops -= 1;
     }
 }
-workspace.clientFullScreenSet.connect(handler)
+
+function fullHandler(client, full, user) {
+    if (full) {
+        moveToNewDesktop(client);
+    } else {
+        moveBack(client);
+    }
+}
+
+function rmHandler(client) {
+    moveBack(client);
+}
+
+function install() {
+    workspace.clientFullScreenSet.connect(fullHandler);
+    workspace.clientRemoved.connect(rmHandler);
+    log("Handler installed");
+}
+
+function uninstall() {
+    workspace.clientFullScreenSet.disconnect(handler);
+    workspace.clientRemoved.disconnect(rmHandler);
+    log("Handler cleared");
+}
+
 registerUserActionsMenu(function(client){
-    print("Registering menu for client " + client.caption);
     return {
-        text: "Maximize helper",
+        text: "Maximize to New Desktop",
         items: [
             {
-                text: "Uninstall",
-                checkable: false,
-                checked: false,
-                triggered: function(act) {
-                    workspace.clientFullScreenSet.disconnect(handler);
-                    print("Handler cleared");
+                text: "Enabled",
+                checkable: true,
+                checked: state.enabled,
+                triggered: function() {
+                    state.enabled = !state.enabled;
+                    if (state.enabled) {
+                        install();
+                    } else {
+                        uninstall();
+                    }
                 }
-            }, {
-                text: "Install",
-                checkable: false,
+            },
+            /*
+            {
+                text: "Disable for this window",
+                checkable: true,
                 checked: false,
                 triggered: function(act) {
-                    workspace.clientFullScreenSet.connect(handler);
-                    print("Handler installed");
+                    log('Not implemented yet!');
                 }
             }
+            */
         ]
     };
 });
-print("Done");
+
+install();
