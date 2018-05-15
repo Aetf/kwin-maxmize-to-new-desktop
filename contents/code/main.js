@@ -44,13 +44,13 @@ function rmHandler(client) {
 }
 
 function install() {
-    workspace.clientFullScreenSet.connect(fullHandler);
+    workspace.clientMaximizeSet.connect(fullHandler);
     workspace.clientRemoved.connect(rmHandler);
     log("Handler installed");
 }
 
 function uninstall() {
-    workspace.clientFullScreenSet.disconnect(handler);
+    workspace.clientMaximizeSet.disconnect(handler);
     workspace.clientRemoved.disconnect(rmHandler);
     log("Handler cleared");
 }
@@ -72,16 +72,6 @@ registerUserActionsMenu(function(client){
                     }
                 }
             },
-            /*
-            {
-                text: "Disable for this window",
-                checkable: true,
-                checked: false,
-                triggered: function(act) {
-                    log('Not implemented yet!');
-                }
-            }
-            */
         ]
     };
 });
