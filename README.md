@@ -1,18 +1,10 @@
-# kwin-maxmize-to-new-desktop
-KWin script that moves fullscreened window to a new virtual desktop, emulating macOS like maximize to new desktop. [Link to KDE Store page](https://store.kde.org/p/1171196/).
+# kwin-macsimize
+This is a fork of Aetf kwin-maximize-to-new-desktop. [Link to his work](https://github.com/Aetf/kwin-maxmize-to-new-desktop).
+
+MACsimize is a KWin script that moves maximized windows to a new virtual desktop, moves back to original desktop if restored or closed. Each window takes place on a new virtual desktop, there's no need to add desktops manually.
 
 ## Screenshot
-![Screenshot](doc/screenshot.gif)
-
-## Feature
-
-* Move window to a newly created virtual desktop when fullscreen.
-* Move window back to original desktop when restored to normal size or closed.
-
-__Note__:
-This is triggered by window **FULLSCREEN**, not the normal maximize. Window fullscreen can be enabled by right clicking on the window decoration -> `More Actions` -> `Fullscreen`.
-
-Web browsers also enters fullscreen mode when the web page requests so, like clicking on fullscreen button in videos. In Firefox or Chrome, pressing `F11` also triggeres this.
+![Screenshot](doc/MACsimize.gif)
 
 ## Change Log
 See [CHANGELOG.md](CHANGELOG.md).
