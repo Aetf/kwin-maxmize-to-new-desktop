@@ -50,7 +50,7 @@ function install() {
 }
 
 function uninstall() {
-    workspace.clientFullScreenSet.disconnect(handler);
+    workspace.clientFullScreenSet.disconnect(fullHandler);
     workspace.clientRemoved.disconnect(rmHandler);
     log("Handler cleared");
 }
