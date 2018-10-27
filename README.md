@@ -14,11 +14,11 @@ The config panel
 
 ## Feature
 
-* Move window to a newly created virtual desktop when fullscreen.
+* Move window to a newly created virtual desktop when fullscreen/maximize.
 * Move window back to original desktop when restored to normal size or closed.
-* Configurable trigger: fullscreen or maximize or _both_.
-* Configurable new desktop position: right most or right to current.
-* Window blacklist. Skip some windows that should not trigger the script.
+* Configurable trigger: `fullscreen` or `maximize` or `both`.
+* Configurable new desktop position: `right most` or `next to current desktop` or `next to app`.
+* Window blacklist: windows that match the class name will not trigger the script.
 
 __Note__:
 The default behavior is triggered by window **FULLSCREEN**, not the normal maximize. Window fullscreen can be enabled by right clicking on the window decoration -> `More Actions` -> `Fullscreen`.

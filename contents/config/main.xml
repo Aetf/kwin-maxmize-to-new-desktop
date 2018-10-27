@@ -19,7 +19,8 @@
             <label>Where to put the new desktop.</label>
             <choices>
                 <choice name="RightMost"></choice>
-                <choice name="RightToCurrent"></choice>
+                <choice name="NextToCurrent"></choice>
+                <choice name="NextToApp"></choice>
             </choices>
         </entry>
         <entry name="keepNonEmptyDesktop" type="Bool">

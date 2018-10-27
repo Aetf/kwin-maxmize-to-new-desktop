@@ -95,7 +95,12 @@
      </item>
      <item>
       <property name="text">
-       <string>Right To Current</string>
+       <string>Next To Current</string>
+      </property>
+     </item>
+     <item>
+      <property name="text">
+       <string>Next To App</string>
       </property>
      </item>
     </widget>
