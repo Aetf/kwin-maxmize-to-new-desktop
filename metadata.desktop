@@ -2,18 +2,22 @@
 Name=Maxmize To New Virtual Desktop
 Comment=Automatically move fullscreened window to a new virtual desktop.
 Icon=preferences-system-windows-script-test
+
+X-KDE-PluginInfo-Author=Aetf
+X-KDE-PluginInfo-Email=aetf@unlimitedcodeworks.com
+X-KDE-PluginInfo-Name=max2NewVirtualDesktop
+X-KDE-PluginInfo-Version=0.2.0
+X-KDE-PluginKeyword=max2NewVirtualDesktop
+X-KDE-PluginInfo-EnabledByDefault=true
+
 Type=Service
 
 X-Plasma-API=javascript
 X-Plasma-MainScript=code/main.js
 
-X-KDE-PluginInfo-Author=Aetf
-X-KDE-PluginInfo-Email=aetf@unlimitedcodeworks.com
-X-KDE-PluginInfo-Name=max2NewVirtualDesktop
-X-KDE-PluginInfo-Version=0.1.0
-X-KDE-PluginInfo-EnabledByDefault=true
+X-KDE-Library=kwin/effects/configs/kcm_kwin4_genericscripted
+X-KDE-ParentComponents=max2NewVirtualDesktop
 
 X-KDE-PluginInfo-Depends=
 X-KDE-PluginInfo-License=MIT
-X-KDE-ServiceTypes=KWin/Script
-X-KDE-PluginKeyword=max2NewVirtualDesktop
+X-KDE-ServiceTypes=KWin/Script,KCModule

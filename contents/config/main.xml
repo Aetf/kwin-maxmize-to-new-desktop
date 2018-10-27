@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<kcfg xmlns="http://www.kde.org/standards/kcfg/1.0"
+            xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+            xsi:schemaLocation="http://www.kde.org/standards/kcfg/1.0
+                                http://www.kde.org/standards/kcfg/1.0/kcfg.xsd">
+    <kcfgfile name=""/>
+    <group name="">
+        <entry name="trigger" type="Enum">
+            <label>When to trigger the script.</label>
+            <default>Fullscreen</default>
+            <choices>
+                <choice name="FullscreenOnly"></choice>
+                <choice name="MaximizeOnly"></choice>
+                <choice name="FullscreenAndMaximize"></choice>
+            </choices>
+        </entry>
+        <entry name="newDesktopPosition" type="Enum">
+            <default>RightMost</default>
+            <label>Where to put the new desktop.</label>
+            <choices>
+                <choice name="RightMost"></choice>
+                <choice name="RightToCurrent"></choice>
+            </choices>
+        </entry>
+        <entry name="keepNonEmptyDesktop" type="Bool">
+            <label>Only remove the virtual desktop if the fullscreen app is the only window.</label>
+            <default>false</default>
+        </entry>
+        <entry name="blockWMClass" type="StringList">
+            <label>The window of WM_CLASS in the following list will be skipped.</label>
+            <default></default>
+        </entry>
+    </group>
+</kcfg>
