@@ -4,9 +4,11 @@ Comment=Automatically move fullscreened window to a new virtual desktop.
 Icon=preferences-system-windows-script-test
 
 X-KDE-PluginInfo-Author=Aetf
-X-KDE-PluginInfo-Email=aetf@unlimitedcodeworks.com
+X-KDE-PluginInfo-Email=aetf@unlimitedcodeworks.xyz
 X-KDE-PluginInfo-Name=max2NewVirtualDesktop
+X-KDE-PluginInfo-Website=https://github.com/Aetf/kwin-maxmize-to-new-desktop
 X-KDE-PluginInfo-Version=0.2.0
+X-KDE-PluginInfo-License=BSDL
 X-KDE-PluginKeyword=max2NewVirtualDesktop
 X-KDE-PluginInfo-EnabledByDefault=true
 
@@ -19,5 +21,4 @@ X-KDE-Library=kwin/effects/configs/kcm_kwin4_genericscripted
 X-KDE-ParentComponents=max2NewVirtualDesktop
 
 X-KDE-PluginInfo-Depends=
-X-KDE-PluginInfo-License=MIT
 X-KDE-ServiceTypes=KWin/Script,KCModule
