@@ -21,10 +21,12 @@ const NewDesktopPositionValue = {
 
 function Config() {
 }
+
 Config.prototype.trigger = function() {
     var v = readConfig('trigger', 'FullscreenOnly');
     return TriggerValues[v];
 };
+
 Config.prototype.newDesktopPosition = function() {
     var v = readConfig("newDesktopPosition", 'RightMost');
     return NewDesktopPositionValue[v];
@@ -45,16 +47,34 @@ Config.prototype.blockWMClass = function() {
 function State() {
     this.savedDesktops = {};
     this.enabled = true;
-    this.config = new Config();
+
+    // cached config values
+    this.cachedConfig = {
+        trigger: TriggerValues.FullscreenOnly,
+        newDesktopPosition: NewDesktopPositionValue.RightMost,
+        keepNonEmptyDesktop: false,
+        blockWMClass: []
+    };
+
+    var config = new Config();
+    this.reload = function () {
+        this.cachedConfig.trigger = config.trigger();
+        this.cachedConfig.newDesktopPosition = config.newDesktopPosition();
+        this.cachedConfig.keepNonEmptyDesktop = config.keepNonEmptyDesktop();
+        this.cachedConfig.blockWMClass = config.blockWMClass();
+    };
+
+    this.reload();
 }
 
 State.prototype.isTriggeredByFull = function() {
-    return this.config.trigger() === TriggerValues.FullscreenOnly
-        || this.config.trigger() === TriggerValues.FullscreenAndMaximize;
+    return this.cachedConfig.trigger === TriggerValues.FullscreenOnly
+        || this.cachedConfig.trigger === TriggerValues.FullscreenAndMaximize;
 }
+
 State.prototype.isTriggeredByMax = function() {
-    return this.config.trigger() === TriggerValues.MaximizeOnly
-        || this.config.trigger() === TriggerValues.FullscreenAndMaximize;
+    return this.cachedConfig.trigger === TriggerValues.MaximizeOnly
+        || this.cachedConfig.trigger === TriggerValues.FullscreenAndMaximize;
 }
 
 State.prototype.isKnownClient = function(client) {
@@ -62,21 +82,59 @@ State.prototype.isKnownClient = function(client) {
 }
 
 State.prototype.isSkippedClient = function (client) {
-    var idx = this.config.blockWMClass().indexOf(client.resourceClass.toString());
+    var idx = this.cachedConfig.blockWMClass.indexOf(client.resourceClass.toString());
     return idx != -1;
 }
+
+State.prototype.getNextDesktop = function (client) {
+    switch (this.cachedConfig.newDesktopPosition) {
+        case NewDesktopPositionValue.RightMost:
+            log('RightMost, workspace.desktops is ' + workspace.desktops);
+            return workspace.desktops + 1;
+        case NewDesktopPositionValue.NextToCurrent:
+            log('NextToCurrent, workspace.currentDesktop is ' + workspace.currentDesktop);
+            return workspace.currentDesktop + 1;
+        case NewDesktopPositionValue.NextToApp:
+            log('NextToApp, client.desktop is ' + client.desktop);
+            return client.desktop + 1;
+        default:
+            log('default, workspace.desktops is ' + workspace.desktops);
+            return workspace.desktops + 1;
+    }
+}
+
+// If the desktop at pos can be removed
+State.prototype.shouldRemoveDesktop = function(pos) {
+    if (pos <= 0) {
+        return false;
+    }
+
+    if (!this.cachedConfig.keepNonEmptyDesktop) {
+        return true;
+    }
+
+    // only remove if the desktop is empty
+    var count = 0;
+    const clients = workspace.clientList();
+    for (var i = 0; i < clients.length; i++) {
+        if (clients[i].desktop == pos) {
+            count++;
+        }
+    }
+    return count == 0;
+};
 
 State.prototype.debugDump = function() {
     log('');
     log('state: enabled ' + this.enabled);
     log('state: triggerFull ' + this.isTriggeredByFull());
     log('state: triggerMax ' + this.isTriggeredByMax());
-    log('state: newPosition ' + this.config.newDesktopPosition());
-    log('state: blockWMClass ' + this.config.blockWMClass().toString());
+    log('state: cachedConfig: ' + JSON.stringify(this.cachedConfig));
     log('state: savedDesktops size ' + Object.keys(this.savedDesktops).length);
     for (var client in this.savedDesktops) {
         log('state: savedDesktops: ' + client + ' => ' + this.savedDesktops[client]);
     }
+    log('workspace: activeClient is ' + workspace.activeClient);
     log('');
 }
 
@@ -123,11 +181,11 @@ function Main() {
         removed: function(client) {
             log('handle remove');
             self.state.debugDump();
-            if (!self.state.isKnownClient(client) || self.state.isSkippedClient(client)) {
+            if (!self.state.isKnownClient(client)) {
                 log('handle remove return');
                 return;
             }
-            self.moveBack(client);
+            self.moveBack(client, true);
             self.state.debugDump();
             log('handle remove done');
         },
@@ -170,7 +228,7 @@ function Main() {
                     {
                         text: 'KeepNonEmpty',
                         checkable: true,
-                        checked: self.state.config.keepNonEmptyDesktop(),
+                        checked: self.state.cachedConfig.keepNonEmptyDesktop,
                         triggered: function () {
                             return;
                         }
@@ -180,44 +238,6 @@ function Main() {
         }
     }
 }
-
-Main.prototype.getNextDesktop = function (client) {
-    switch (this.state.config.newDesktopPosition()) {
-        case NewDesktopPositionValue.RightMost:
-            log('RightMost, workspace.desktops is ' + workspace.desktops);
-            return workspace.desktops + 1;
-        case NewDesktopPositionValue.NextToCurrent:
-            log('NextToCurrent, workspace.currentDesktop is ' + workspace.currentDesktop);
-            return workspace.currentDesktop + 1;
-        case NewDesktopPositionValue.NextToApp:
-            log('NextToApp, client.desktop is ' + client.desktop);
-            return client.desktop + 1;
-        default:
-            log('default, workspace.desktops is ' + workspace.desktops);
-            return workspace.desktops + 1;
-    }
-}
-
-// If the desktop at pos can be removed
-Main.prototype.shouldRemoveDesktop = function(pos) {
-    if (pos <= 0) {
-        return false;
-    }
-
-    if (!this.state.config.keepNonEmptyDesktop()) {
-        return true;
-    }
-
-    // only remove if the desktop is empty
-    var count = 0;
-    const clients = workspace.clientList();
-    for (var i = 0; i < clients.length; i++) {
-        if (clients[i].desktop == pos) {
-            count++;
-        }
-    }
-    return count == 0;
-};
 
 // shift clients' desktop on desktop [from, to], to direction
 Main.prototype.shiftClients = function (direction, from, to) {
@@ -273,7 +293,7 @@ Main.prototype.popDesktop = function (pos) {
         return;
     }
 
-    if (!this.shouldRemoveDesktop(pos)) {
+    if (!this.state.shouldRemoveDesktop(pos)) {
         log('popDesktop: should not remove desktop');
         return;
     }
@@ -292,7 +312,7 @@ Main.prototype.popDesktop = function (pos) {
 Main.prototype.moveToNewDesktop = function(client) {
     this.state.savedDesktops[client.windowId] = client.desktop;
 
-    var next = this.getNextDesktop(client);
+    var next = this.state.getNextDesktop(client);
     this.insertDesktop(next);
     client.desktop = next;
 
@@ -300,7 +320,9 @@ Main.prototype.moveToNewDesktop = function(client) {
     workspace.activeClient = client;
 }
 
-Main.prototype.moveBack = function(client) {
+Main.prototype.moveBack = function(client, removed) {
+    removed = typeof removed !== "undefined" ? removed : false;
+
     if (!this.state.isKnownClient(client)) {
         log("Ignoring window not previously seen: " + client.caption);
         return;
@@ -308,17 +330,20 @@ Main.prototype.moveBack = function(client) {
 
     log("inside moving back: " + client.caption);
     var saved = this.state.savedDesktops[client.windowId];
+    delete this.state.savedDesktops[client.windowId];
+
     var toRemove = client.desktop;
 
     log("Resotre client desktop to " + saved);
-    client.desktop = saved;
     workspace.currentDesktop = saved;
-    workspace.activeClient = client;
-    delete this.state.savedDesktops[client.windowId];
+
+    client.desktop = saved;
+    if (!removed) {
+        workspace.activeClient = client;
+    }
 
     this.popDesktop(toRemove);
 }
-
 
 Main.prototype.install = function() {
     workspace.clientFullScreenSet.connect(this.handlers.fullscreen);

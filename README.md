@@ -70,6 +70,20 @@ Or you could try something like the following to restart kwin (the executable na
 kwin_x11 --replace >/dev/null 2>/dev/null &; disown
 ```
 
+### KWin hangs or crashes after a fullscreened/maximized window is directly closed
+
+This can sometimes happen after closing a fullscreened/maximized window, and immediately switching focus
+to other applications using Alt-Tab or closing another window (especially if the window belongs to the same
+application as the just closed fullscreened/maximized window, i.e. two Konsole windows).
+
+I debugged a little bit and it seems to be some bug around window activation inside KWin, and there's no easy
+fix.
+
+The workaround is
+
+1. Avoid quickly switching window after directly close a fullscreened/maximized window.
+2. Restore to window to normal size before close it.
+
 ## Change Log
 
 See [CHANGELOG.md](CHANGELOG.md).
