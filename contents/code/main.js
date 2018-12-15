@@ -178,7 +178,7 @@ function Main() {
             log('handle maximize done');
         },
 
-        removed: function(client) {
+        closed: function(client) {
             log('handle remove');
             self.state.debugDump();
             if (!self.state.isKnownClient(client)) {
@@ -312,6 +312,11 @@ Main.prototype.popDesktop = function (pos) {
 Main.prototype.moveToNewDesktop = function(client) {
     this.state.savedDesktops[client.windowId] = client.desktop;
 
+    // register the client's windowClosed event
+    // we cannot use the global clientRemoved event, which is called
+    // after cleanGrouping of the client, and will cause crash of kwin
+    client.windowClosed.connect(this.handlers.closed);
+
     var next = this.state.getNextDesktop(client);
     this.insertDesktop(next);
     client.desktop = next;
@@ -332,6 +337,9 @@ Main.prototype.moveBack = function(client, removed) {
     var saved = this.state.savedDesktops[client.windowId];
     delete this.state.savedDesktops[client.windowId];
 
+    // unregister the client's windowClosed event
+    client.windowClosed.disconnect(this.handlers.closed);
+
     var toRemove = client.desktop;
 
     log("Resotre client desktop to " + saved);
@@ -348,14 +356,12 @@ Main.prototype.moveBack = function(client, removed) {
 Main.prototype.install = function() {
     workspace.clientFullScreenSet.connect(this.handlers.fullscreen);
     workspace.clientMaximizeSet.connect(this.handlers.maximize);
-    workspace.clientRemoved.connect(this.handlers.removed);
     log("Handler installed");
 }
 
 Main.prototype.uninstall = function() {
     workspace.clientFullScreenSet.disconnect(this.handlers.fullscreen);
     workspace.clientMaximizeSet.disconnect(this.handlers.maximize);
-    workspace.clientRemoved.disconnect(this.handlers.removed);
     log("Handler cleared");
 }
 
