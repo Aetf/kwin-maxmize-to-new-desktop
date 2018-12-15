@@ -70,19 +70,13 @@ Or you could try something like the following to restart kwin (the executable na
 kwin_x11 --replace >/dev/null 2>/dev/null &; disown
 ```
 
-### KWin hangs or crashes after a fullscreened/maximized window is directly closed
+### ~~KWin hangs or crashes after a fullscreened/maximized window is directly closed~~
 
-This can sometimes happen after closing a fullscreened/maximized window, and immediately switching focus
-to other applications using Alt-Tab or closing another window (especially if the window belongs to the same
-application as the just closed fullscreened/maximized window, i.e. two Konsole windows).
+Fixed in efc212cbc38b8f5d10a30d28a034e21288519ea4.
 
-I debugged a little bit and it seems to be some bug around window activation inside KWin, and there's no easy
-fix.
-
-The workaround is
-
-1. Avoid quickly switching window after directly close a fullscreened/maximized window.
-2. Restore to window to normal size before close it.
+The root cause is the clientRemoved signal I connected to is too late and only emits after
+cleanGrouping called on the client. Moving the client around and changing focus requires a not null
+group of the client in kwin. Therefore, changing to per window windowClosed signal works.
 
 ## Change Log
 
