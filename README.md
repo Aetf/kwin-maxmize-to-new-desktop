@@ -53,7 +53,7 @@ tab, there's a little utility called "Detect Window Properties" that can be used
 
 ### No configuration button available in the KWin Scripts entry
 
-Due to a technical limitation of installation, the desktop file is installed into correct place. More details [here](https://github.com/faho/kwin-tiling/issues/79#issuecomment-311465357).
+Due to a technical limitation of installation, the desktop file is not installed into correct place. More details [here](https://github.com/faho/kwin-tiling/issues/79#issuecomment-311465357).
 
 ```bash
 mkdir -p ~/.local/share/kservices5
