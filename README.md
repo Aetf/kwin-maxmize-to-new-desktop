@@ -33,6 +33,9 @@ Go to `System Settings` -> `Window Management` -> `KWin Scripts` -> `Get New Scr
 
 And then search for `kwin-maximize-to-new-desktop`.
 
+Note: __To get the configuration panel fully working, see [this](#no-configuration-button-available-in-the-kwin-scripts-entry)
+and [this](#blank-window-class-blacklist-in-configuration)__
+
 ### Install directly
 
 Download the latest release from KDE [store][store], and run
@@ -40,6 +43,9 @@ Download the latest release from KDE [store][store], and run
 ```bash
 plasmapkg2 --install kwin-maxmize-to-new-desktop-0.2.0.tar.gz
 ```
+
+Note: __To get the configuration panel fully working, see [this](#no-configuration-button-available-in-the-kwin-scripts-entry)
+and [this](#window-class-blacklist-in-configuration-is-blank)__
 
 ## Tips
 
@@ -59,6 +65,14 @@ Due to a technical limitation of installation, the desktop file is not installed
 mkdir -p ~/.local/share/kservices5
 ln -s ~/.local/share/kwin/scripts/max2NewVirtualDesktop/metadata.desktop ~/.local/share/kservices5/max2NewVirtualDesktop.desktop
 ```
+
+### Blank window class blacklist in configuration
+
+You need to install an additional package called `kdesignerplugin` ([link](https://github.com/KDE/kdesignerplugin)),
+which makes it possible to use KEditListWidget.
+
+* For ArchLinux: `pacman -Syu kdesignerplugin`.
+* For Ubuntu and alike: `apt install kdesignerplugin`.
 
 ### Configuration not picked up by the script after changing
 

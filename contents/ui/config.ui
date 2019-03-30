@@ -87,7 +87,7 @@
     </widget>
    </item>
    <item row="2" column="1">
-    <widget class="KComboBox" name="kcfg_newDesktopPosition">
+    <widget class="QComboBox" name="kcfg_newDesktopPosition">
      <item>
       <property name="text">
        <string>Right Most</string>
@@ -144,7 +144,7 @@
     </widget>
    </item>
    <item row="1" column="1">
-    <widget class="KComboBox" name="kcfg_trigger">
+    <widget class="QComboBox" name="kcfg_trigger">
      <item>
       <property name="text">
        <string>Fullscreen Only</string>
@@ -197,11 +197,6 @@
   </layout>
  </widget>
  <customwidgets>
-  <customwidget>
-   <class>KComboBox</class>
-   <extends>QComboBox</extends>
-   <header>kcombobox.h</header>
-  </customwidget>
   <customwidget>
    <class>KEditListWidget</class>
    <extends>QWidget</extends>
