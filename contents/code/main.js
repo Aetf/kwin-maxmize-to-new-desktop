@@ -356,12 +356,14 @@ Main.prototype.moveBack = function(client, removed) {
 Main.prototype.install = function() {
     workspace.clientFullScreenSet.connect(this.handlers.fullscreen);
     workspace.clientMaximizeSet.connect(this.handlers.maximize);
+    workspace.clientRemoved.connect(this.handlers.closed);
     log("Handler installed");
 }
 
 Main.prototype.uninstall = function() {
     workspace.clientFullScreenSet.disconnect(this.handlers.fullscreen);
     workspace.clientMaximizeSet.disconnect(this.handlers.maximize);
+    workspace.clientRemoved.disconnect(this.handlers.closed);
     log("Handler cleared");
 }
 
