@@ -47,6 +47,7 @@ Config.prototype.blockWMClass = function() {
 function State() {
     this.savedDesktops = {};
     this.enabled = true;
+    this.savedHandlers = {};
 
     // cached config values
     this.cachedConfig = {
@@ -315,7 +316,14 @@ Main.prototype.moveToNewDesktop = function(client) {
     // register the client's windowClosed event
     // we cannot use the global clientRemoved event, which is called
     // after cleanGrouping of the client, and will cause crash of kwin
-    client.windowClosed.connect(this.handlers.closed);
+
+    // Due to KWin bug[1], the signal handler can't get arguments.
+    // So we bind arguments here to a new function.
+    // [1]: https://bugs.kde.org/show_bug.cgi?id=449181
+    // See also: issue #14
+    var handler = this.handlers.closed.bind(null, client);
+    this.state.savedHandlers[client.windowId] = handler;
+    client.windowClosed.connect(handler);
 
     var next = this.state.getNextDesktop(client);
     this.insertDesktop(next);
@@ -337,8 +345,11 @@ Main.prototype.moveBack = function(client, removed) {
     var saved = this.state.savedDesktops[client.windowId];
     delete this.state.savedDesktops[client.windowId];
 
+    var handler = this.state.savedHandlers[client.windowId];
+    delete this.state.savedHandlers[client.windowId];
+
     // unregister the client's windowClosed event
-    client.windowClosed.disconnect(this.handlers.closed);
+    client.windowClosed.disconnect(handler);
 
     var toRemove = client.desktop;
 
