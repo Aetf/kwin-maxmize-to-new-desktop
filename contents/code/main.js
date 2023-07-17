@@ -18,6 +18,10 @@ const NewDesktopPositionValue = {
     NextToCurrent: 1,
     NextToApp: 2,
 };
+/**
+ * Clients that should skipped always
+ */
+const GlobalSkippedClients = ['ksmserver-logout-greeter', 'plasmashell'];
 
 function Config() {
 }
@@ -83,7 +87,11 @@ State.prototype.isKnownClient = function(client) {
 }
 
 State.prototype.isSkippedClient = function (client) {
-    var idx = this.cachedConfig.blockWMClass.indexOf(client.resourceClass.toString());
+    const resourceClass = client.resourceClass.toString();
+    if (GlobalSkippedClients.indexOf(resourceClass) != -1) {
+        return true;
+    }
+    var idx = this.cachedConfig.blockWMClass.indexOf();
     return idx != -1;
 }
 
@@ -177,6 +185,35 @@ function Main() {
             }
             self.state.debugDump();
             log('handle maximize done');
+        },
+
+        added: function(client) {
+            log('handle added');
+            var area = workspace.clientArea(KWin.MaximizeArea, client);
+            
+            // const clause = {
+            //     resourceClass: client.resourceClass.toString(),
+            //     clientArea: {
+            //         width: client.width,
+            //         height: client.height
+            //     },
+            //     maximizeArea: {
+            //         width: area.width,
+            //         height: area.height
+            //     }
+            // };
+            // log('clause = ' + JSON.stringify(clause));
+
+            // There may be a 1-pixel gap on some display/screen
+            var isMaximized = client.width + 1 >= area.width && client.height + 1 >= area.height;
+
+            if (isMaximized) {
+                self.handlers.maximize(client, true, true);
+            // } else {
+            //     log('not maximized, skip');
+            }
+            log('handle added done');
+            //if (!(!isMaximized || state.isSkippedClient(client) || state.isSkippedName(client))) {main.moveToNewDesktop(client);};
         },
 
         closed: function(client) {
@@ -367,12 +404,14 @@ Main.prototype.moveBack = function(client, removed) {
 Main.prototype.install = function() {
     workspace.clientFullScreenSet.connect(this.handlers.fullscreen);
     workspace.clientMaximizeSet.connect(this.handlers.maximize);
+    workspace.clientAdded.connect(this.handlers.added);
     log("Handler installed");
 }
 
 Main.prototype.uninstall = function() {
     workspace.clientFullScreenSet.disconnect(this.handlers.fullscreen);
     workspace.clientMaximizeSet.disconnect(this.handlers.maximize);
+    workspace.clientAdded.disconnect(this.handlers.added);
     log("Handler cleared");
 }
 
