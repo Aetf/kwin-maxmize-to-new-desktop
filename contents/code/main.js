@@ -91,7 +91,7 @@ State.prototype.isSkippedClient = function (client) {
     if (GlobalSkippedClients.indexOf(resourceClass) != -1) {
         return true;
     }
-    var idx = this.cachedConfig.blockWMClass.indexOf();
+    var idx = this.cachedConfig.blockWMClass.indexOf(resourceClass);
     return idx != -1;
 }
 
@@ -213,7 +213,6 @@ function Main() {
             //     log('not maximized, skip');
             }
             log('handle added done');
-            //if (!(!isMaximized || state.isSkippedClient(client) || state.isSkippedName(client))) {main.moveToNewDesktop(client);};
         },
 
         closed: function(client) {
