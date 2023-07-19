@@ -21,7 +21,7 @@ const NewDesktopPositionValue = {
 /**
  * Clients that should skipped always
  */
-const GlobalSkippedClients = ['ksmserver-logout-greeter', 'plasmashell'];
+const GlobalSkippedClients = ['ksmserver-logout-greeter', 'plasmashell', 'latte-dock', 'lattedock'];
 
 function Config() {
 }
